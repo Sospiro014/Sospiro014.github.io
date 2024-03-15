@@ -4,7 +4,7 @@ published: true
 ---
 
 - Title: Membership Management System - SQL injection
-- Application: Hospital Management System
+- Application: Membership Management System
 - Date: 01.03.2024
 - Bugs: SQL injection
 - Exploit Author: SoSPiro
