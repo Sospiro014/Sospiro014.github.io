@@ -65,37 +65,39 @@
 </ul>
 
 <hr />
+
+<h3 id="vulnerability-details">Vulnerability Details</h3>
+
+<ul>
+  <li><strong>Application Name:</strong> Art Gallery Management System</li>
+  <li><strong>Vendor Homepage:</strong> <a href="https://phpgurukul.com/">Vendor Homepage</a></li>
+  <li><strong>Software Link:</strong> <a href="https://phpgurukul.com/art-gallery-management-system-using-php-and-mysql/">Vendor Homepage</a></li>
+  <li>The vulnerability lies in the following code snippet:</li>
+</ul>
+
+<p><code class="language-plaintext highlighter-rouge">Art-Gallery-MS-PHP/agms/search.php</code></p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?php</span>
+<span class="mf">...</span>
+
+<span class="o">&lt;</span><span class="n">h3</span> <span class="n">class</span><span class="o">=</span><span class="s2">"title text-center mb-lg-5"</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="n">h2</span> <span class="n">class</span><span class="o">=</span><span class="s2">"head"</span> <span class="n">align</span><span class="o">=</span><span class="s2">"center"</span><span class="o">&gt;</span>
+        <span class="nc">Search</span> <span class="nc">Result</span> <span class="nc">Againt</span> <span class="n">keyword</span> 
+        <span class="o">&lt;</span><span class="n">span</span> <span class="n">style</span><span class="o">=</span><span class="s2">"color:red"</span><span class="o">&gt;</span><span class="s2">"&lt;?php echo </span><span class="nv">$_POST['search']</span><span class="s2">;?&gt;"</span><span class="o">&lt;/</span><span class="n">span</span><span class="o">&gt;</span>
+    <span class="o">&lt;/</span><span class="n">h2</span><span class="o">&gt;</span>
+    <span class="o">&lt;</span><span class="n">hr</span> <span class="o">/&gt;</span>
+<span class="mf">...</span>
+
+<span class="cp">?&gt;</span>
+</code></pre></div></div>
+<p>This code has an XSS (Cross-Site Scripting) vulnerability. The <strong>$_POST[‘search’]</strong> parameter, which is user input, is directly embedded into HTML, allowing potentially malicious JavaScript code to execute on the page.</p>
+
 <h3 id="vulnerability-description">Vulnerability Description:</h3>
 
 <p>A security vulnerability has been identified within the <code class="language-plaintext highlighter-rouge">search.php</code> file of this application. 
-It has been observed that the input provided by users when searching ($_POST[‘search’]) is not properly sanitized. 
+It has been observed that the input provided by users when searching <strong>($_POST[‘search’])</strong> is not properly sanitized. 
 While the user-supplied data within the input field is directly embedded into HTML content,
 necessary filtering and escaping processes have not been applied.</p>
-
-<ul>
-  <li><code class="language-plaintext highlighter-rouge">Art-Gallery-MS-PHP/agms/search.php</code></li>
-</ul>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;h3 class="title text-center mb-lg-5"&gt;
-    &lt;h2 class="head" align="center"&gt;
-        Search Result Againt keyword 
-        &lt;span style="color:red"&gt;"&lt;?php echo $_POST['search'];?&gt;"&lt;/span&gt;
-    &lt;/h2&gt;
-    &lt;hr /&gt;
-</code></pre></div></div>
-
-<p>In this code snippet, the data entered by the user into the search parameter is directly
-embedded into HTML. Consequently, malicious users can exploit this field to
-perform XSS (Cross-Site Scripting) attacks, enabling them to execute scripts in the context
-of the user’s browser to steal session information or modify the page.</p>
-
-<h3 id="impact">Impact</h3>
-
-<p>This security vulnerability allows attackers to steal sessioninformation through
-XSS attacks on the web application, deceive users by directing them to malicious actions,
-or modify page content. This can lead to the exposure of personal information, phishing attacks,
-and overall compromise of the application’s security. Therefore, immediate intervention to address
-the security vulnerability in the application and implementation of necessary fixes are crucial.</p>
 
 <h3 id="proof-of-concept">Proof of Concept:</h3>
 
@@ -143,6 +145,14 @@ search=&lt;script&gt;alert(1111)&lt;/script&gt;
 
 ...
 </code></pre></div></div>
+
+<h3 id="impact">Impact</h3>
+
+<p>This security vulnerability allows attackers to steal sessioninformation through
+XSS attacks on the web application, deceive users by directing them to malicious actions,
+or modify page content. This can lead to the exposure of personal information, phishing attacks,
+and overall compromise of the application’s security. Therefore, immediate intervention to address
+the security vulnerability in the application and implementation of necessary fixes are crucial.</p>
 
 </article>
       </section>

@@ -15,39 +15,42 @@ published: true
 - **Tested on:** Windows 10 64 bit Wampserver 
 
 ----
-### Vulnerability Description:
-
-A security vulnerability has been identified within the `search.php` file of this application. 
-It has been observed that the input provided by users when searching ($_POST['search']) is not properly sanitized. 
-While the user-supplied data within the input field is directly embedded into HTML content,
-necessary filtering and escaping processes have not been applied.
 
 
-- `Art-Gallery-MS-PHP/agms/search.php`
 
-```
+### Vulnerability Details
+
+- **Application Name:** Art Gallery Management System 
+- **Vendor Homepage:** [Vendor Homepage](https://phpgurukul.com/)
+- **Software Link:** [Vendor Homepage](https://phpgurukul.com/art-gallery-management-system-using-php-and-mysql/)
+- The vulnerability lies in the following code snippet:
+
+`Art-Gallery-MS-PHP/agms/search.php`
+
+```php
+<?php
+...
+
 <h3 class="title text-center mb-lg-5">
     <h2 class="head" align="center">
         Search Result Againt keyword 
         <span style="color:red">"<?php echo $_POST['search'];?>"</span>
     </h2>
     <hr />
+...
+
+?>
 ```
+This code has an XSS (Cross-Site Scripting) vulnerability. The **$_POST['search']** parameter, which is user input, is directly embedded into HTML, allowing potentially malicious JavaScript code to execute on the page.
 
-In this code snippet, the data entered by the user into the search parameter is directly
-embedded into HTML. Consequently, malicious users can exploit this field to
-perform XSS (Cross-Site Scripting) attacks, enabling them to execute scripts in the context
-of the user's browser to steal session information or modify the page.
+### Vulnerability Description:
+
+A security vulnerability has been identified within the `search.php` file of this application. 
+It has been observed that the input provided by users when searching **($_POST['search'])** is not properly sanitized. 
+While the user-supplied data within the input field is directly embedded into HTML content,
+necessary filtering and escaping processes have not been applied.
 
 
-
-### Impact
-
-This security vulnerability allows attackers to steal sessioninformation through
-XSS attacks on the web application, deceive users by directing them to malicious actions,
-or modify page content. This can lead to the exposure of personal information, phishing attacks,
-and overall compromise of the application's security. Therefore, immediate intervention to address
-the security vulnerability in the application and implementation of necessary fixes are crucial.
 
 
 
@@ -95,3 +98,11 @@ search=<script>alert(1111)</script>
 
 ...
 ```
+
+### Impact
+
+This security vulnerability allows attackers to steal sessioninformation through
+XSS attacks on the web application, deceive users by directing them to malicious actions,
+or modify page content. This can lead to the exposure of personal information, phishing attacks,
+and overall compromise of the application's security. Therefore, immediate intervention to address
+the security vulnerability in the application and implementation of necessary fixes are crucial.

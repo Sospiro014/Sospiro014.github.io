@@ -28,6 +28,36 @@
 
 &lt;hr /&gt;
 
+&lt;h3 id=&quot;vulnerability-details&quot;&gt;Vulnerability Details&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;Application Name:&lt;/strong&gt; Art Gallery Management System&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Vendor Homepage:&lt;/strong&gt; &lt;a href=&quot;https://phpgurukul.com/&quot;&gt;Vendor Homepage&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Software Link:&lt;/strong&gt; &lt;a href=&quot;https://phpgurukul.com/art-gallery-management-system-using-php-and-mysql/&quot;&gt;Vendor Homepage&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;The vulnerability lies in the following code snippet:&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Art-Gallery-MS-PHP/agms/single-product.php/single-product.php&lt;/code&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cp&quot;&gt;&amp;lt;?php&lt;/span&gt;
+&lt;span class=&quot;mf&quot;&gt;...&lt;/span&gt;
+
+&lt;span class=&quot;nv&quot;&gt;$pid&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$_GET&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;pid&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;
+
+&lt;span class=&quot;nv&quot;&gt;$ret&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nf&quot;&gt;mysqli_query&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$con&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;select tblarttype.ID as atid,tblarttype.ArtType as typename,tblartmedium.ID
+as amid,tblartmedium.ArtMedium as amname,tblartproduct.ID as apid,tblartist.Name,tblartproduct.Title,
+tblartproduct.Dimension,tblartproduct.Orientation,tblartproduct.Size,tblartproduct.Artist,
+tblartproduct.ArtType,tblartproduct.ArtMedium,tblartproduct.SellingPricing,tblartproduct.Description,
+tblartproduct.Image,tblartproduct.Image1,tblartproduct.Image2,tblartproduct.Image3,tblartproduct.Image4,
+tblartproduct.RefNum,tblartproduct.ArtType from tblartproduct join tblarttype on tblarttype.ID=tblartproduct.ArtType 
+join tblartmedium on tblartmedium.ID=tblartproduct.ArtMedium join tblartist on tblartist.ID=tblartproduct.Artist where tblartproduct.ID=&apos;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$pid&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&apos;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+&lt;span class=&quot;mf&quot;&gt;...&lt;/span&gt;
+
+&lt;span class=&quot;cp&quot;&gt;?&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;In this code, SQL injection occurs because the user input is directly concatenated into the SQL query without proper sanitization or validation. The $_GET[‘pid’] user input is included directly in the query without being checked or cleaned, allowing attackers to inject malicious SQL code and potentially manipulate the database or access sensitive information.&lt;/p&gt;
+
 &lt;h3 id=&quot;vulnerability-description&quot;&gt;Vulnerability Description:&lt;/h3&gt;
 
 &lt;p&gt;The vulnerability exists in the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;single-product.php&lt;/code&gt; file of AGMS,
@@ -52,7 +82,7 @@ CONCAT(0x71716b7671,0x4e54625a41616c594e416443545a424f765177596b4d436155664a6766
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;Poc Foto&lt;/li&gt;
+  &lt;li&gt;Poc Foto &lt;strong&gt;(Time Based Blind SQL Injection)&lt;/strong&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;&lt;img src=&quot;/assets/zday/raJ8Cp9.png&quot; alt=&quot;This is an alt text.&quot; title=&quot;poc foto&quot; /&gt;&lt;/p&gt;
@@ -80,20 +110,6 @@ Parameter: pid (GET)
 &lt;p&gt;This vulnerability enables malicious actors to execute various harmful actions,
 including session hijacking, data exfiltration, and tampering with database structures.&lt;/p&gt;
 
-&lt;h3 id=&quot;vulnerable-code-section&quot;&gt;Vulnerable code section:&lt;/h3&gt;
-&lt;p&gt;====================================================&lt;/p&gt;
-
-&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Art-Gallery-MS-PHP/agms/single-product.php/single-product.php&lt;/code&gt;&lt;/p&gt;
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$pid=$_GET[&apos;pid&apos;];
-
-$ret=mysqli_query($con,&quot;select tblarttype.ID as atid,tblarttype.ArtType as typename,tblartmedium.ID
-as amid,tblartmedium.ArtMedium as amname,tblartproduct.ID as apid,tblartist.Name,tblartproduct.Title,
-tblartproduct.Dimension,tblartproduct.Orientation,tblartproduct.Size,tblartproduct.Artist,
-tblartproduct.ArtType,tblartproduct.ArtMedium,tblartproduct.SellingPricing,tblartproduct.Description,
-tblartproduct.Image,tblartproduct.Image1,tblartproduct.Image2,tblartproduct.Image3,tblartproduct.Image4,
-tblartproduct.RefNum,tblartproduct.ArtType from tblartproduct join tblarttype on tblarttype.ID=tblartproduct.ArtType 
-join tblartmedium on tblartmedium.ID=tblartproduct.ArtMedium join tblartist on tblartist.ID=tblartproduct.Artist where tblartproduct.ID=&apos;$pid&apos;&quot;);
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 </description>
         <pubDate>Sat, 16 Mar 2024 00:00:00 +0400</pubDate>
         <link>http://localhost:8000//agms-sql-inj</link>
@@ -117,37 +133,39 @@ join tblartmedium on tblartmedium.ID=tblartproduct.ArtMedium join tblartist on t
 &lt;/ul&gt;
 
 &lt;hr /&gt;
+
+&lt;h3 id=&quot;vulnerability-details&quot;&gt;Vulnerability Details&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;Application Name:&lt;/strong&gt; Art Gallery Management System&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Vendor Homepage:&lt;/strong&gt; &lt;a href=&quot;https://phpgurukul.com/&quot;&gt;Vendor Homepage&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Software Link:&lt;/strong&gt; &lt;a href=&quot;https://phpgurukul.com/art-gallery-management-system-using-php-and-mysql/&quot;&gt;Vendor Homepage&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;The vulnerability lies in the following code snippet:&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Art-Gallery-MS-PHP/agms/search.php&lt;/code&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cp&quot;&gt;&amp;lt;?php&lt;/span&gt;
+&lt;span class=&quot;mf&quot;&gt;...&lt;/span&gt;
+
+&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;h3&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;class&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;title text-center mb-lg-5&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;h2&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;class&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;head&quot;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;align&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;center&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nc&quot;&gt;Search&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Result&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;Againt&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;keyword&lt;/span&gt; 
+        &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;span&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;style&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;color:red&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&amp;lt;?php echo &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$_POST[&apos;search&apos;]&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;;?&amp;gt;&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;span&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;&amp;lt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;h2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;hr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;mf&quot;&gt;...&lt;/span&gt;
+
+&lt;span class=&quot;cp&quot;&gt;?&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;This code has an XSS (Cross-Site Scripting) vulnerability. The &lt;strong&gt;$_POST[‘search’]&lt;/strong&gt; parameter, which is user input, is directly embedded into HTML, allowing potentially malicious JavaScript code to execute on the page.&lt;/p&gt;
+
 &lt;h3 id=&quot;vulnerability-description&quot;&gt;Vulnerability Description:&lt;/h3&gt;
 
 &lt;p&gt;A security vulnerability has been identified within the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;search.php&lt;/code&gt; file of this application. 
-It has been observed that the input provided by users when searching ($_POST[‘search’]) is not properly sanitized. 
+It has been observed that the input provided by users when searching &lt;strong&gt;($_POST[‘search’])&lt;/strong&gt; is not properly sanitized. 
 While the user-supplied data within the input field is directly embedded into HTML content,
 necessary filtering and escaping processes have not been applied.&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Art-Gallery-MS-PHP/agms/search.php&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;lt;h3 class=&quot;title text-center mb-lg-5&quot;&amp;gt;
-    &amp;lt;h2 class=&quot;head&quot; align=&quot;center&quot;&amp;gt;
-        Search Result Againt keyword 
-        &amp;lt;span style=&quot;color:red&quot;&amp;gt;&quot;&amp;lt;?php echo $_POST[&apos;search&apos;];?&amp;gt;&quot;&amp;lt;/span&amp;gt;
-    &amp;lt;/h2&amp;gt;
-    &amp;lt;hr /&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;In this code snippet, the data entered by the user into the search parameter is directly
-embedded into HTML. Consequently, malicious users can exploit this field to
-perform XSS (Cross-Site Scripting) attacks, enabling them to execute scripts in the context
-of the user’s browser to steal session information or modify the page.&lt;/p&gt;
-
-&lt;h3 id=&quot;impact&quot;&gt;Impact&lt;/h3&gt;
-
-&lt;p&gt;This security vulnerability allows attackers to steal sessioninformation through
-XSS attacks on the web application, deceive users by directing them to malicious actions,
-or modify page content. This can lead to the exposure of personal information, phishing attacks,
-and overall compromise of the application’s security. Therefore, immediate intervention to address
-the security vulnerability in the application and implementation of necessary fixes are crucial.&lt;/p&gt;
 
 &lt;h3 id=&quot;proof-of-concept&quot;&gt;Proof of Concept:&lt;/h3&gt;
 
@@ -195,6 +213,14 @@ search=&amp;lt;script&amp;gt;alert(1111)&amp;lt;/script&amp;gt;
 
 ...
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;impact&quot;&gt;Impact&lt;/h3&gt;
+
+&lt;p&gt;This security vulnerability allows attackers to steal sessioninformation through
+XSS attacks on the web application, deceive users by directing them to malicious actions,
+or modify page content. This can lead to the exposure of personal information, phishing attacks,
+and overall compromise of the application’s security. Therefore, immediate intervention to address
+the security vulnerability in the application and implementation of necessary fixes are crucial.&lt;/p&gt;
 </description>
         <pubDate>Sat, 16 Mar 2024 00:00:00 +0400</pubDate>
         <link>http://localhost:8000//agms-reflected-xss</link>
