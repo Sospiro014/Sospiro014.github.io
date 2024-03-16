@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <meta name="generator" content="Jekyll">
+
+  <title>Membership Management System - SQL injection</title>
+
+  <link rel="stylesheet" href="/css/main.css">
+  
+  <link href="/atom.xml" type="application/atom+xml" rel="alternate" title="ATOM Feed" /> <!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Membership Management System - SQL injection | Hacker-Blog</title>
+<meta name="generator" content="Jekyll v4.3.3" />
+<meta property="og:title" content="Membership Management System - SQL injection" />
+<meta name="author" content="SoSPiro" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Title: Membership Management System - SQL injection Application: Membership Management System Date: 01.03.2024 Bugs: SQL injection Exploit Author: SoSPiro Vendor Homepage: https://codeastro.com/author/nbadmin/ Software Link: https://codeastro.com/membership-management-system-in-php-with-source-code/ Version: 1.0 Tested on: Windows 10 64 bit Wampserver" />
+<meta property="og:description" content="Title: Membership Management System - SQL injection Application: Membership Management System Date: 01.03.2024 Bugs: SQL injection Exploit Author: SoSPiro Vendor Homepage: https://codeastro.com/author/nbadmin/ Software Link: https://codeastro.com/membership-management-system-in-php-with-source-code/ Version: 1.0 Tested on: Windows 10 64 bit Wampserver" />
+<link rel="canonical" href="http://localhost:8000/Membership-Management-System-SQL-injection" />
+<meta property="og:url" content="http://localhost:8000/Membership-Management-System-SQL-injection" />
+<meta property="og:site_name" content="Hacker-Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2024-03-01T00:00:00+04:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Membership Management System - SQL injection" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"SoSPiro","url":"http://0.0.0.0:8000/hacker-blog-master"},"dateModified":"2024-03-01T00:00:00+04:00","datePublished":"2024-03-01T00:00:00+04:00","description":"Title: Membership Management System - SQL injection Application: Membership Management System Date: 01.03.2024 Bugs: SQL injection Exploit Author: SoSPiro Vendor Homepage: https://codeastro.com/author/nbadmin/ Software Link: https://codeastro.com/membership-management-system-in-php-with-source-code/ Version: 1.0 Tested on: Windows 10 64 bit Wampserver","headline":"Membership Management System - SQL injection","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:8000/Membership-Management-System-SQL-injection"},"url":"http://localhost:8000/Membership-Management-System-SQL-injection"}</script>
+<!-- End Jekyll SEO tag -->
+
+</head>
+
+<body>
+  <div id="wrapper">
+    <header>
+  <div>
+    <a href="/">
+    
+    <h1>sospiro@home:~$</h1>
+    </a>
+    <div class="header-links">
+      <a href="/archive"><h2 class="header-link">Archive</h2></a>
+<a href="/about"><h2 class="header-link">About</h2></a>
+<a href="/atom.xml"><h2 class="header-link">RSS</h2></a>
+
+    </div>
+  </div>
+</header>
+    <div class="container">
+      <section id="main_content">
+        <article>
+  <h2>Membership Management System - SQL injection</h2>
+  <time datetime="2024-03-01T00:00:00+04:00" class="by-line">01 Mar 2024</time>
+  <ul>
+  <li>Title: Membership Management System - SQL injection</li>
+  <li>Application: Membership Management System</li>
+  <li>Date: 01.03.2024</li>
+  <li>Bugs: SQL injection</li>
+  <li>Exploit Author: SoSPiro</li>
+  <li>Vendor Homepage: https://codeastro.com/author/nbadmin/</li>
+  <li>Software Link: https://codeastro.com/membership-management-system-in-php-with-source-code/</li>
+  <li>Version: 1.0</li>
+  <li>Tested on: Windows 10 64 bit Wampserver</li>
+</ul>
+
+<h3 id="vulnerability-description">Vulnerability Description:</h3>
+
+<p>The provided payload in the POST request indicates a potential SQL injection vulnerability. Specifically, the manipulation within the email and password parameters suggests an attempt to influence the SQL query directly, presenting a risk for exploiting security vulnerabilities.</p>
+
+<h3 id="sql-injection">SQL Injection:</h3>
+
+<p>This manipulated submission aims to affect the SQL query by incorporating user input. For instance, the use of <strong>sleep(5)</strong> introduces a time-delay technique, indicative of a potential resource-consuming attack vector by malevolent actors.</p>
+
+<h3 id="proof-of-concept-poc">Proof of Concept (PoC):</h3>
+
+<p>Below is an example payload illustrating the SQL injection vulnerability:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>email=test@123.asd' + (SELECT * FROM (SELECT (SLEEP(5)))a) +'&amp;password=admin' or '1'='1'&amp;login=
+</code></pre></div></div>
+
+<p>In this example, the <strong>sleep(5)</strong> function is employed to induce a time delay, followed by the use of or <strong>‘1’=’1’</strong> in the password control section, aiming to always evaluate as true.</p>
+
+<ul>
+  <li>Request Response</li>
+</ul>
+
+<p><a href="https://gcdnb.pbrd.co/images/9k8xy4YRomp3.png?o=1">PoC FoTo</a></p>
+
+<h3 id="vulnerable-code-section">Vulnerable Code Section:</h3>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$email</span> <span class="o">=</span> <span class="nv">$_POST</span><span class="p">[</span><span class="s1">'email'</span><span class="p">];</span>
+<span class="nv">$password</span> <span class="o">=</span> <span class="nv">$_POST</span><span class="p">[</span><span class="s1">'password'</span><span class="p">];</span>
+
+<span class="nv">$hashed_password</span> <span class="o">=</span> <span class="nb">md5</span><span class="p">(</span><span class="nv">$password</span><span class="p">);</span>
+<span class="nv">$sql</span> <span class="o">=</span> <span class="s2">"SELECT * FROM users WHERE email = '</span><span class="nv">$email</span><span class="s2">' AND password = '</span><span class="nv">$hashed_password</span><span class="s2">'"</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>The provided PHP code section exacerbates the SQL injection risk by directly incorporating user input into the SQL query. To mitigate this vulnerability, the use of parameterized queries or prepared statements is recommended.</p>
+
+
+</article>
+      </section>
+    </div>
+  </div>
+
+   <footer>
+  <a href="https://creativecommons.org/licenses/by-nc/3.0/deed.en">
+    <span>
+        <b>SoSPiro</b>
+    </span>
+    
+    <span>© 2024</span>
+  </a>
+</footer>
+
+  
+</body>
+
+</html>

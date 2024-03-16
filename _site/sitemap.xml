@@ -1,22 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
-<loc>http://localhost:8000/Another-Sample-Page</loc>
-<lastmod>2017-12-10T00:00:00+04:00</lastmod>
-</url>
-<url>
-<loc>http://localhost:8000/One-More-Sample-Page</loc>
-<lastmod>2017-12-11T00:00:00+04:00</lastmod>
-</url>
-<url>
-<loc>http://localhost:8000/Sample-Page</loc>
-<lastmod>2017-12-12T00:00:00+04:00</lastmod>
-</url>
-<url>
-<loc>http://localhost:8000/Yet-Another-Sample-Page</loc>
-<lastmod>2018-01-06T00:00:00+04:00</lastmod>
-</url>
-<url>
 <loc>http://localhost:8000/Bank-Locker-Management-System-SQL-Injection</loc>
 <lastmod>2023-09-12T00:00:00+04:00</lastmod>
 </url>
@@ -71,6 +55,22 @@
 <url>
 <loc>http://localhost:8000/Hospital-Management-System-1.0-Insecure-Direct-Object-Reference-+-Account-Takeover</loc>
 <lastmod>2024-02-27T00:00:00+04:00</lastmod>
+</url>
+<url>
+<loc>http://localhost:8000/Membership-Management-System-SQL-injection</loc>
+<lastmod>2024-03-01T00:00:00+04:00</lastmod>
+</url>
+<url>
+<loc>http://localhost:8000/Membership-Management-System-RCE</loc>
+<lastmod>2024-03-14T00:00:00+04:00</lastmod>
+</url>
+<url>
+<loc>http://localhost:8000/agms-reflected-xss</loc>
+<lastmod>2024-03-16T00:00:00+04:00</lastmod>
+</url>
+<url>
+<loc>http://localhost:8000/agms-sql-inj</loc>
+<lastmod>2024-03-16T00:00:00+04:00</lastmod>
 </url>
 <url>
 <loc>http://localhost:8000/404</loc>
