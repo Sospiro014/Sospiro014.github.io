@@ -1,0 +1,14 @@
+---
+layout: default
+---
+<h1>Projects</h1>
+
+<ul>
+    {% for project in site.projects %}
+    <li>
+        <h2><a href="{{ project.url | relative_url }}">{{ project.title }}</a></h2>
+        <time datetime="{{ project.date | date_to_xmlschema }}" class="by-line">{{ project.date | date_to_string }}</time>
+        <p>{{ project.content | strip_html | truncatewords:50 }}</p>
+    </li>
+    {% endfor %}
+    </ul>
