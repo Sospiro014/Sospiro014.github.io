@@ -5,7 +5,6 @@ published: true
 
 
 - Exploit Title: Hospital Management System - IDOR + Accaunt Takeover
-- Google Dork: N/A
 - Application: Hospital Management System
 - Date: 27.02.2024
 - Bugs: IDOR + Accaunt Takeover
@@ -14,12 +13,36 @@ published: true
 - Software Link: https://www.sourcecodester.com/php/16720/free-hospital-management-system-small-practices.html
 - Version: 1.0
 - Tested on: Windows 10 64 bit Wampserver
-- CVE : N/A
 
 
-### Vulnerability Description:
+### Description:
 
 This report focuses on two vulnerabilities known as "Insecure Direct Object References (IDOR)" and "Account Takeover". These vulnerabilities occur in a scenario where user input and access privileges validation is inadequate.
+
+
+### Vulnerability Details:
+
+- **Application Name**:  Hospital Management System
+- **Software Link**: [Download Link](https://www.sourcecodester.com/php/16720/free-hospital-management-system-small-practices.html)
+- **Vendor Homepage**: [Vendor Homepage](https://www.sourcecodester.com/)
+
+
+
+### The vulnerability lies in the following code snippet:
+
+```php
+$sql1="update patient set pemail='$email',pname='$name',ppassword='$password',pnic='$nic',ptel='$tele',paddress='$address' where pid=$id ;";
+$database->query($sql1);
+echo $sql1;
+$sql1="update webuser set email='$email' where email='$oldemail' ;";
+$database->query($sql1);
+echo $sql1;
+```
+
+## Vulnerability Description:
+
+The vulnerabilities in Hospital Management System 1.0 involve Insecure Direct Object References (IDOR) and Account Takeover due to insufficient validation of user input and access privileges. IDOR allows attackers to manipulate user identifiers, granting unauthorized access to and modification of other users' information. This oversight also facilitates Account Takeover, enabling attackers to modify sensitive user data and potentially hijack legitimate accounts for malicious activities.
+
 
 
 ### Proof of Concept (PoC):
@@ -79,17 +102,17 @@ the user's identity is obtained from the POST data, the attacker can pass his id
 
 [Poc viode](https://www.youtube.com/watch?v=pmoBSnu9IYI)
 
+### Impact and Risks:
 
-### Vulnerable code section:
+- These security vulnerabilities pose severe risks to the integrity, confidentiality, and availability of the Hospital Management System. The identified risks include:
 
-```php
-$sql1="update patient set pemail='$email',pname='$name',ppassword='$password',pnic='$nic',ptel='$tele',paddress='$address' where pid=$id ;";
-$database->query($sql1);
-echo $sql1;
-$sql1="update webuser set email='$email' where email='$oldemail' ;";
-$database->query($sql1);
-echo $sql1;
-```
+1. Unauthorized Access: Attackers can gain unauthorized access to sensitive user information, including personal details and medical records, leading to privacy breaches and confidentiality violations.
+
+2. Data Modification: The ability to manipulate user data enables attackers to tamper with records, potentially causing misinformation, incorrect treatments, and compromised patient care.
+
+3. Account Takeover: With the capability to change user credentials, attackers can hijack legitimate user accounts, leading to identity theft, fraudulent activities, and loss of trust in the system.
+
+4. Non-compliance: Exploiting these vulnerabilities may result in non-compliance with regulatory requirements and industry standards, such as HIPAA (Health Insurance Portability and Accountability Act), exposing the organization to legal liabilities and financial penalties.
 
 
 ### **Risks This security vulnerability exposes user information to unauthorized access and modifications. Consequently, there are potential risks such as account takeover, privacy breaches, and non-compliance with security policies, which can lead to substantial damage and security breaches in the system.**
