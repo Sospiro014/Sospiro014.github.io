@@ -39,6 +39,9 @@ $database->query($sql1);
 echo $sql1;
 ```
 
+In the above SQL queries, the $id value received from the user is directly included in the query and security checks are not performed. This allows exploiting another user's information. At the same time, since the user's identity is obtained from the POST data, the attacker can pass his identity as another user's identity.
+
+
 ## Vulnerability Description:
 
 The vulnerabilities in Hospital Management System 1.0 involve Insecure Direct Object References (IDOR) and Account Takeover due to insufficient validation of user input and access privileges. IDOR allows attackers to manipulate user identifiers, granting unauthorized access to and modification of other users' information. This oversight also facilitates Account Takeover, enabling attackers to modify sensitive user data and potentially hijack legitimate accounts for malicious activities.
@@ -96,9 +99,6 @@ Cookie: PHPSESSID=4c8per12a8freilu1upich92a4
 id00=1&oldemail=patient%40patient.com&email=patient%40patient.com&name=MRRS.Sunita+Dighe&nic=422201&Tele=9090909091&address=attac&password=q1w2e3&cpassword=q1w2e3
 ```
 
-In the above SQL queries, the $id value received from the user is directly included in the query and security
-checks are not performed. This allows exploiting another user's information. At the same time, since
-the user's identity is obtained from the POST data, the attacker can pass his identity as another user's identity.
 
 [Poc viode](https://www.youtube.com/watch?v=pmoBSnu9IYI)
 
