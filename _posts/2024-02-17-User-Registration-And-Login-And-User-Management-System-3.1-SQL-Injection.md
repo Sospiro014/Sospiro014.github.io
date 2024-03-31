@@ -11,7 +11,7 @@ published: true
 - Vendor Homepage: https://phpgurukul.com/
 - Software Link: https://phpgurukul.com/user-registration-login-and-user-management-system-with-admin-panel/
 - Tested on: Windows 10 64 bit Wampserver
-
+- CVE : CVE-2024-28323
 * * *
 
 ### Description:
